@@ -4,6 +4,8 @@ Sistema web para gerenciamento de estoque de livros, com cadastro, capas, busca,
 
 Aplicacao em producao: https://bookinventoryadvanced.vercel.app
 
+Pagina de apresentacao via GitHub Pages: https://thecarlosramos.github.io/estoque/
+
 ## Funcionalidades
 
 - Login simples por nome de usuario.
@@ -34,6 +36,7 @@ Aplicacao em producao: https://bookinventoryadvanced.vercel.app
 .
 |-- api/
 |   `-- state.js          # API Vercel para ler e salvar o estado compartilhado
+|-- docs/                 # Pagina estatica para GitHub Pages
 |-- app.js                # Logica da aplicacao e integracao com a API
 |-- index.html            # Interface principal
 |-- style.css             # Estilos da aplicacao
@@ -87,6 +90,18 @@ npx vercel --prod
 O projeto ja esta conectado ao repositorio:
 
 https://github.com/TheCarlosRamos/estoque
+
+## GitHub Pages
+
+A pasta `docs/` contem uma pagina estatica separada da aplicacao principal. Ela deve ser usada apenas como vitrine do projeto.
+
+Configuracao recomendada no GitHub:
+
+- Source: `Deploy from a branch`
+- Branch: `main`
+- Folder: `/docs`
+
+Assim, o GitHub Pages publica a pagina de apresentacao, enquanto a aplicacao real continua rodando na Vercel.
 
 ## Observacoes
 
