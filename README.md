@@ -2,9 +2,9 @@
 
 Sistema web para gerenciamento de estoque de livros, com cadastro, capas, busca, movimentacoes, relatorios e persistencia compartilhada via Vercel + Upstash Redis.
 
-Aplicacao em producao: https://bookinventoryadvanced.vercel.app
+Aplicacao principal: hospedada na Vercel, com link compartilhado apenas diretamente.
 
-Pagina de apresentacao via GitHub Pages: https://thecarlosramos.github.io/estoque/
+Versao simples via GitHub Pages: https://thecarlosramos.github.io/estoque/
 
 ## Funcionalidades
 
@@ -36,7 +36,7 @@ Pagina de apresentacao via GitHub Pages: https://thecarlosramos.github.io/estoqu
 .
 |-- api/
 |   `-- state.js          # API Vercel para ler e salvar o estado compartilhado
-|-- docs/                 # Pagina estatica para GitHub Pages
+|-- docs/                 # Versao simples para GitHub Pages
 |-- app.js                # Logica da aplicacao e integracao com a API
 |-- index.html            # Interface principal
 |-- style.css             # Estilos da aplicacao
@@ -93,7 +93,7 @@ https://github.com/TheCarlosRamos/estoque
 
 ## GitHub Pages
 
-A pasta `docs/` contem uma pagina estatica separada da aplicacao principal. Ela deve ser usada apenas como vitrine do projeto.
+A pasta `docs/` contem uma versao simples da aplicacao para GitHub Pages. Ela salva os dados apenas no `localStorage` do navegador e nao usa o banco compartilhado da Vercel.
 
 Configuracao recomendada no GitHub:
 
@@ -101,7 +101,7 @@ Configuracao recomendada no GitHub:
 - Branch: `main`
 - Folder: `/docs`
 
-Assim, o GitHub Pages publica a pagina de apresentacao, enquanto a aplicacao real continua rodando na Vercel.
+Assim, o GitHub Pages publica uma demonstracao simples, enquanto a aplicacao principal com persistencia compartilhada continua rodando separadamente na Vercel.
 
 ## Observacoes
 

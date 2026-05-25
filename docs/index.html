@@ -3,117 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Estoque de Livros | Projeto</title>
+  <title>Estoque de Livros | Versao Simples</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="hero">
-    <nav class="nav">
-      <strong>Estoque de Livros</strong>
+  <main class="app">
+    <header class="topbar">
       <div>
-        <a href="https://github.com/TheCarlosRamos/estoque">Repositorio</a>
-        <a class="button small" href="https://bookinventoryadvanced.vercel.app">Abrir aplicacao</a>
+        <span class="eyebrow">GitHub Pages</span>
+        <h1>Estoque de Livros</h1>
+        <p>Versao simples com dados salvos apenas neste navegador.</p>
       </div>
-    </nav>
+      <button onclick="exportCSV()">Exportar CSV</button>
+    </header>
 
-    <section class="hero-grid">
-      <div class="hero-copy">
-        <span class="eyebrow">Projeto web com dados compartilhados</span>
-        <h1>Controle de estoque de livros simples, visual e online.</h1>
-        <p>
-          Uma aplicacao para cadastrar livros, controlar entradas e saidas,
-          acompanhar movimentacoes e manter as alteracoes sincronizadas para todos os usuarios.
-        </p>
-        <div class="actions">
-          <a class="button" href="https://bookinventoryadvanced.vercel.app">Usar aplicacao</a>
-          <a class="button secondary" href="#detalhes">Ver detalhes</a>
-        </div>
-      </div>
-
-      <div class="preview" aria-label="Previa visual da aplicacao">
-        <div class="preview-top">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <div class="preview-summary">
-          <div><small>Livros</small><strong>24</strong></div>
-          <div><small>Estoque</small><strong>318</strong></div>
-          <div><small>Baixo</small><strong>5</strong></div>
-        </div>
-        <div class="preview-card">
-          <div class="cover-block"></div>
-          <div>
-            <strong>Dom Casmurro</strong>
-            <p>Machado de Assis</p>
-            <span>12 em estoque</span>
-          </div>
-        </div>
-        <div class="preview-table">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-    </section>
-  </header>
-
-  <main id="detalhes">
-    <section class="section">
+    <section class="summary">
       <div>
-        <span class="eyebrow">Funcionalidades</span>
-        <h2>Feito para o fluxo do estoque</h2>
+        <span>Livros</span>
+        <strong id="totalBooks">0</strong>
       </div>
-      <div class="feature-grid">
-        <article>
-          <h3>Cadastro completo</h3>
-          <p>Registre titulo, autor e capa de cada livro.</p>
-        </article>
-        <article>
-          <h3>Movimentacoes</h3>
-          <p>Controle entradas e saidas individuais ou em lote, com motivo obrigatorio.</p>
-        </article>
-        <article>
-          <h3>Estoque seguro</h3>
-          <p>O sistema bloqueia saidas que deixariam algum livro com quantidade negativa.</p>
-        </article>
-        <article>
-          <h3>Relatorios</h3>
-          <p>Acompanhe historico de alteracoes com data, usuario, tipo e quantidade.</p>
-        </article>
-        <article>
-          <h3>Busca e filtros</h3>
-          <p>Encontre livros por titulo ou autor e destaque itens com estoque baixo.</p>
-        </article>
-        <article>
-          <h3>Exportacao</h3>
-          <p>Baixe uma planilha Excel com o estoque atual.</p>
-        </article>
+      <div>
+        <span>Itens</span>
+        <strong id="totalStock">0</strong>
+      </div>
+      <div>
+        <span>Baixo estoque</span>
+        <strong id="lowStockCount">0</strong>
       </div>
     </section>
 
-    <section class="section split">
-      <div>
-        <span class="eyebrow">Arquitetura</span>
-        <h2>GitHub Pages para apresentacao, Vercel para uso real</h2>
-        <p>
-          Esta pagina serve como vitrine do projeto. A aplicacao principal roda na Vercel,
-          onde tambem existe a API serverless que conversa com o banco Upstash Redis.
-        </p>
+    <section class="panel">
+      <h2>Cadastrar livro</h2>
+      <div class="controls">
+        <input id="title" placeholder="Titulo">
+        <input id="author" placeholder="Autor">
+        <button onclick="addBook()">Adicionar</button>
       </div>
-      <div class="stack">
-        <span>HTML</span>
-        <span>CSS</span>
-        <span>JavaScript</span>
-        <span>Vercel</span>
-        <span>Upstash Redis</span>
+    </section>
+
+    <section class="panel">
+      <h2>Busca e filtros</h2>
+      <div class="controls">
+        <input id="search" placeholder="Buscar por titulo ou autor" oninput="render()">
+        <label><input type="checkbox" id="lowStock" onchange="render()"> Baixo estoque</label>
+      </div>
+    </section>
+
+    <section class="panel batch-panel">
+      <h2>Movimentacao em lote</h2>
+      <div class="controls">
+        <button class="secondary" onclick="selectVisibleBooks()">Selecionar visiveis</button>
+        <button class="secondary" onclick="clearSelection()">Limpar selecao</button>
+        <button onclick="batchMove(1)">Entrada em lote</button>
+        <button class="danger" onclick="batchMove(-1)">Saida em lote</button>
+        <span><strong id="selectedCount">0</strong> selecionado(s)</span>
+      </div>
+    </section>
+
+    <section id="books" class="shelf"></section>
+
+    <section class="panel">
+      <h2>Movimentacoes</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Livro</th>
+              <th>Tipo</th>
+              <th>Qtd.</th>
+              <th>Motivo</th>
+            </tr>
+          </thead>
+          <tbody id="report"></tbody>
+        </table>
       </div>
     </section>
   </main>
 
-  <footer>
-    <span>Projeto Estoque de Livros</span>
-    <a href="https://bookinventoryadvanced.vercel.app">Acessar aplicacao em producao</a>
-  </footer>
+  <script src="app.js"></script>
 </body>
 </html>
