@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estoque Avancado</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <section id="login" class="login">
+      <h1>Estoque de Livros</h1>
+      <div class="login-box">
+        <input id="user" placeholder="Usuario">
+        <button onclick="login()">Entrar</button>
+      </div>
+    </section>
+
+    <section id="app" style="display:none">
+      <header class="topbar">
+        <div>
+          <h1>Estoque de Livros</h1>
+          <p>Usuario: <strong id="currentUser"></strong></p>
+        </div>
+        <button class="primary-action" onclick="exportExcel()">Exportar Excel</button>
+      </header>
+
+      <section class="summary">
+        <div>
+          <span>Livros</span>
+          <strong id="totalBooks">0</strong>
+        </div>
+        <div>
+          <span>Itens em estoque</span>
+          <strong id="totalStock">0</strong>
+        </div>
+        <div>
+          <span>Estoque baixo</span>
+          <strong id="lowStockCount">0</strong>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Cadastrar livro</h2>
+        <div class="controls">
+          <input id="title" placeholder="Titulo">
+          <input id="author" placeholder="Autor">
+          <input type="file" id="cover" accept="image/*">
+          <button onclick="addBook()">Adicionar</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Busca e filtros</h2>
+        <div class="controls">
+          <input id="search" placeholder="Buscar por titulo ou autor" oninput="render()">
+          <label><input type="checkbox" id="lowStock" onchange="render()"> Baixo estoque</label>
+        </div>
+      </section>
+
+      <section class="panel batch-panel">
+        <h2>Movimentacao em lote</h2>
+        <div class="controls">
+          <button class="secondary" onclick="selectVisibleBooks()">Selecionar livros visiveis</button>
+          <button class="secondary" onclick="clearBookSelection()">Limpar selecao</button>
+          <button onclick="batchMove(1)">Entrada em lote</button>
+          <button class="danger" onclick="batchMove(-1)">Saida em lote</button>
+          <span><strong id="selectedCount">0</strong> selecionado(s)</span>
+        </div>
+      </section>
+
+      <section id="books" class="shelf"></section>
+
+      <section class="panel">
+        <h2>Relatorio de movimentacoes</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Usuario</th>
+                <th>Livro</th>
+                <th>Tipo</th>
+                <th>Qtd.</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+            <tbody id="report"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Controle de usuarios</h2>
+        <div class="controls">
+          <input id="newUser" placeholder="Nome do usuario">
+          <select id="newRole">
+            <option>Operador</option>
+            <option>Administrador</option>
+            <option>Consulta</option>
+          </select>
+          <button onclick="addUser()">Adicionar usuario</button>
+        </div>
+        <ul id="users" class="users"></ul>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
