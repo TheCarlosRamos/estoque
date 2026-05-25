@@ -1,44 +1,95 @@
-# Estoque de Livros Avançado 📚
+# Estoque de Livros
 
-Um sistema web completo para gerenciamento de estoque de livros, construído com HTML, CSS e JavaScript Vanilla. 
+Sistema web para gerenciamento de estoque de livros, com cadastro, capas, busca, movimentacoes, relatorios e persistencia compartilhada via Vercel + Upstash Redis.
 
-## 🚀 Funcionalidades
+Aplicacao em producao: https://bookinventoryadvanced.vercel.app
 
-*   **Controle de Usuários:** Simulação de login com níveis de acesso (Operador, Administrador, Consulta).
-*   **Gerenciamento de Livros:** Cadastro de livros com título, autor e upload de capa.
-*   **Controle de Estoque:** Entrada e saída de estoque, com validações para impedir estoque negativo.
-*   **Movimentação em Lote:** Seleção de múltiplos livros para entrada ou saída simultânea em lote.
-*   **Histórico e Relatórios:** Registro automático de todas as movimentações (entradas, saídas, edições, exclusões) contendo data, usuário e motivo.
-*   **Filtros e Busca:** Busca em tempo real por título ou autor e filtro rápido para itens com estoque baixo.
-*   **Exportação:** Exportação dos dados de estoque atual para formato Excel (`.xls`).
-*   **Sincronização:** Suporte a armazenamento compartilhado (via API local) com fallback automático para `localStorage` do navegador caso o backend não esteja disponível.
+## Funcionalidades
 
-## 🛠️ Tecnologias Utilizadas
+- Login simples por nome de usuario.
+- Cadastro de livros com titulo, autor e imagem de capa.
+- Busca por titulo ou autor.
+- Filtro de livros com estoque baixo.
+- Entrada e saida individual de estoque.
+- Entrada e saida em lote para livros selecionados.
+- Bloqueio de saidas que deixariam o estoque negativo.
+- Edicao de titulo e autor.
+- Atualizacao de capa.
+- Exclusao de livros.
+- Relatorio de movimentacoes com data, usuario, livro, tipo, quantidade e motivo.
+- Controle simples de usuarios.
+- Exportacao do estoque para Excel (`.xls`).
+- Dados compartilhados entre usuarios por meio de API serverless e Redis.
 
-*   **HTML5:** Estruturação semântica da página.
-*   **CSS3:** Estilização visual (arquivo `style.css`).
-*   **JavaScript (ES6+):** Lógica da aplicação, manipulação do DOM e gerenciamento de estado (arquivo `app.js`).
+## Tecnologias
 
-## 📁 Estrutura do Projeto
+- HTML, CSS e JavaScript vanilla.
+- Vercel para hospedagem e funcoes serverless.
+- Upstash Redis para persistencia compartilhada.
+- `@upstash/redis` para acesso ao banco na API.
+
+## Estrutura
 
 ```text
-book_inventory_advanced/
-├── index.html     # Ponto de entrada da aplicação, estrutura da interface
-├── app.js         # Lógica de negócio, manipulação de estado e eventos
-├── style.css      # Regras de estilização e layout
-├── .gitignore     # Configurações do Git
-└── .vercel/       # Configurações de deploy (se aplicável)
+.
+|-- api/
+|   `-- state.js          # API Vercel para ler e salvar o estado compartilhado
+|-- app.js                # Logica da aplicacao e integracao com a API
+|-- index.html            # Interface principal
+|-- style.css             # Estilos da aplicacao
+|-- package.json          # Dependencias e scripts
+|-- package-lock.json
+`-- README.md
 ```
 
-## 💻 Como executar o projeto localmente
+## Como Rodar Localmente
 
-1.  Como este projeto utiliza apenas tecnologias front-end nativas, você não precisa instalar nenhuma dependência (como Node.js ou npm).
-2.  Para abrir o projeto, basta rodar um servidor HTTP simples na pasta do projeto ou usar a extensão "Live Server" do VS Code.
-    *   *Exemplo usando Python:* `python -m http.server 8000`
-    *   *Exemplo usando npx:* `npx serve .`
-3.  Acesse `http://localhost:8000` (ou a porta correspondente) no seu navegador.
-    *   *Nota:* Como há uso de módulos ou requisições `fetch` (para simular a API de estado), abrir o arquivo `index.html` diretamente (via `file:///`) pode causar bloqueios de CORS, portanto, o uso de um servidor local é recomendado.
+Instale as dependencias:
 
-## 👥 Gerenciamento de Estado
+```bash
+npm install
+```
 
-O sistema tenta se conectar a um endpoint `/api/state` para persistir os dados (livros, logs e usuários). Caso a API não esteja acessível, ele possui um mecanismo de tolerância a falhas que avisa o usuário e passa a utilizar o `localStorage` do navegador como backup, garantindo que o aplicativo continue funcional.
+Rode com o ambiente da Vercel:
+
+```bash
+npx vercel dev
+```
+
+Depois acesse a URL local exibida no terminal.
+
+Para usar o banco compartilhado localmente, e necessario ter as variaveis da Vercel em `.env.local`. Elas sao geradas com:
+
+```bash
+npx vercel env pull .env.local
+```
+
+O arquivo `.env.local` nao deve ser commitado.
+
+## Persistencia Compartilhada
+
+O app tenta carregar e salvar os dados em `/api/state`. Essa API usa Upstash Redis para manter um unico estado compartilhado contendo:
+
+- livros;
+- movimentacoes;
+- usuarios.
+
+Se a API ou o banco nao estiverem disponiveis, o app usa `localStorage` como fallback temporario para continuar funcionando no navegador.
+
+## Deploy
+
+O deploy de producao pode ser feito com:
+
+```bash
+npx vercel --prod
+```
+
+O projeto ja esta conectado ao repositorio:
+
+https://github.com/TheCarlosRamos/estoque
+
+## Observacoes
+
+- O controle de usuarios atual e simples e nao possui senha/autenticacao real.
+- As imagens de capa sao armazenadas junto ao estado como Data URL; para uso maior, o ideal seria mover as imagens para um armazenamento de arquivos, como Vercel Blob.
+- O plano gratuito do Upstash Redis possui limites de uso. Para este projeto pequeno, ele deve ser suficiente.
