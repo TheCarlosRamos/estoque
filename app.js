@@ -3,6 +3,8 @@ let books = JSON.parse(localStorage.getItem("books") || "[]");
 let logs = JSON.parse(localStorage.getItem("logs") || "[]");
 let users = JSON.parse(localStorage.getItem("users") || "[]");
 let selectedBookIds = new Set();
+let sharedStorageReady = false;
+let sharedStorageErrorShown = false;
 
 const LOW_STOCK_LIMIT = 5;
 
@@ -14,11 +16,7 @@ books = books.map((book, index) => ({
   img: book.img || null,
 }));
 
-logs = logs.map((log) =>
-  typeof log === "string"
-    ? { date: "", user: "", book: log, type: "Historico", qty: 0, reason: "" }
-    : log,
-);
+logs = normalizeLogs(logs);
 
 function $(id) {
   return document.getElementById(id);
@@ -41,14 +39,84 @@ function makeId(seed = "") {
   return `book-${Date.now()}-${seed}-${Math.random().toString(16).slice(2)}`;
 }
 
-function save() {
+function normalizeBooks(items) {
+  return (Array.isArray(items) ? items : []).map((book, index) => ({
+    id: book.id || makeId(index),
+    t: book.t || "",
+    a: book.a || "",
+    qty: Number(book.qty) || 0,
+    img: book.img || null,
+  }));
+}
+
+function normalizeLogs(items) {
+  return (Array.isArray(items) ? items : []).map((log) =>
+    typeof log === "string"
+      ? { date: "", user: "", book: log, type: "Historico", qty: 0, reason: "" }
+      : log,
+  );
+}
+
+function normalizeUsers(items) {
+  return Array.isArray(items) ? items : [];
+}
+
+function applyState(state) {
+  books = normalizeBooks(state.books);
+  logs = normalizeLogs(state.logs);
+  users = normalizeUsers(state.users);
+  selectedBookIds = new Set([...selectedBookIds].filter((id) => books.some((book) => book.id === id)));
+}
+
+function saveLocalMirror() {
   localStorage.setItem("books", JSON.stringify(books));
   localStorage.setItem("logs", JSON.stringify(logs));
   localStorage.setItem("users", JSON.stringify(users));
-  render();
 }
 
-function login() {
+async function loadSharedState() {
+  try {
+    const response = await fetch("/api/state", { cache: "no-store" });
+    if (!response.ok) throw new Error("Shared storage unavailable");
+
+    applyState(await response.json());
+    sharedStorageReady = true;
+    saveLocalMirror();
+  } catch (error) {
+    sharedStorageReady = false;
+    if (!sharedStorageErrorShown) {
+      console.warn("Usando armazenamento local ate o banco compartilhado ser configurado.");
+      sharedStorageErrorShown = true;
+    }
+  }
+}
+
+async function persistSharedState() {
+  if (!sharedStorageReady) return;
+
+  const response = await fetch("/api/state", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ books, logs, users }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel salvar no banco compartilhado.");
+  }
+}
+
+async function save() {
+  saveLocalMirror();
+  render();
+
+  try {
+    await persistSharedState();
+  } catch (error) {
+    alert("A alteracao ficou salva neste navegador, mas nao foi enviada ao banco compartilhado.");
+  }
+}
+
+async function login() {
   const name = $("user").value.trim();
 
   if (!name) {
@@ -57,16 +125,18 @@ function login() {
   }
 
   currentUser = name;
-
-  if (!users.some((user) => user.name.toLowerCase() === name.toLowerCase())) {
-    users.push({ name, role: users.length ? "Operador" : "Administrador" });
-    localStorage.setItem("users", JSON.stringify(users));
-  }
-
   $("login").style.display = "none";
   $("app").style.display = "block";
   $("currentUser").textContent = currentUser;
-  render();
+
+  await loadSharedState();
+
+  if (!users.some((user) => user.name.toLowerCase() === name.toLowerCase())) {
+    users.push({ name, role: users.length ? "Operador" : "Administrador" });
+    await save();
+  } else {
+    render();
+  }
 }
 
 function addMovement(book, type, qty, reason) {

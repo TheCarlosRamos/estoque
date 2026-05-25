@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.35.3"
+  },
+  "devDependencies": {}
+}
