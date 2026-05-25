@@ -4,7 +4,6 @@ Sistema web para gerenciamento de estoque de livros, com cadastro, capas, busca,
 
 Aplicacao principal: hospedada na Vercel, com link compartilhado apenas diretamente.
 
-Versao simples via GitHub Pages: https://thecarlosramos.github.io/estoque/
 
 ## Funcionalidades
 
